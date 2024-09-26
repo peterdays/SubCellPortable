@@ -1,0 +1,28 @@
+rybg:
+  mae_contrast_supcon_model:
+    classifier: "https://"
+    encoder: "https://"
+  vit_supcon_model:
+    classifier: "https://"
+    encoder: "https://"
+rbg:
+  mae_contrast_supcon_model:
+    classifier: "https://"
+    encoder: "https://"
+  vit_supcon_model:
+    classifier: "https://"
+    encoder: "https://"
+ybg:
+  mae_contrast_supcon_model:
+    classifier: "https://"
+    encoder: "https://"
+  vit_supcon_model:
+    classifier: "https://"
+    encoder: "https://"
+bg:
+  mae_contrast_supcon_model:
+    classifier: "https://"
+    encoder: "https://"
+  vit_supcon_model:
+    classifier: "https://"
+    encoder: "https://"
