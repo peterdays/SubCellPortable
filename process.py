@@ -3,6 +3,7 @@ import datetime
 import logging
 import os
 import sys
+import pandas as pd
 
 import requests
 from skimage.io import imread, imsave
@@ -24,6 +25,7 @@ config = { "log": logger}
 config["model_channels"] = "rybg"
 config["model_type"] = "mae_contrast_supcon_model"
 config["update_model"] = False
+config["create_csv"] = False
 
 # If you want to use command line parameters with your script, add them here
 if len(sys.argv) > 1:
@@ -31,6 +33,7 @@ if len(sys.argv) > 1:
     argparser.add_argument("-c", "--model_channels", help="channel images to be used [rybg, rbg, ybg, bg]", default="rybg", type=str)
     argparser.add_argument("-t", "--model_type", help="model type to be used [mae_contrast_supcon_model, vit_supcon_model]", default="mae_contrast_supcon_model", type=str)
     argparser.add_argument("-u", "--update_model", help="if you want to update the selected model files [True, False]", default=False, type=bool)
+    argparser.add_argument("-csv", "--create_csv", help="if you want to merge the resulting probabilities and features in csv format [True, False]", default=False, type=bool)
     args = argparser.parse_args()
     config = config | args.__dict__
 
@@ -79,6 +82,19 @@ try:
     model = inference.ViTPoolClassifier(model_config)
     model.load_model_dict(encoder_path, classifier_path)
 
+    # if we want to generate a csv result
+    if config["create_csv"]:
+        final_columns = ["id", "top_class_name", "top_class", "top_3_classes_names", "top_3_classes"]
+        prob_columns = []
+        for i in range(31):
+            prob_columns.append("prob" + "%02d" % (i,))
+        final_columns.extend(prob_columns)
+        feat_columns = []
+        for i in range(1536):
+            feat_columns.append("feat" + "%04d" % (i,))
+        final_columns.extend(feat_columns)
+        df = pd.DataFrame(columns=final_columns)
+
     # We iterate over each set of images to process
     if os.path.exists("./path_list.csv"):
         path_list = open("./path_list.csv", 'r')
@@ -99,9 +115,33 @@ try:
                 if "g" in config["model_channels"]:
                     cell_data.append([imread(curr_set_arr[3].strip(), as_gray=True)])
 
-                inference.run_model(model, cell_data, os.path.join(curr_set_arr[4], curr_set_arr[5].strip()))
-                config["log"].info("- Saved result for " +  os.path.join(curr_set_arr[4], curr_set_arr[5].strip()))
+                # We run the model in inference
+                embedding, probabilities = inference.run_model(model, cell_data, os.path.join(curr_set_arr[4], curr_set_arr[5].strip()))
 
+                curr_probs_l = probabilities.tolist()
+                max_location_class = curr_probs_l.index(max(curr_probs_l))
+                max_location_name = inference.CLASS2NAME[max_location_class]
+                max_3_location_classes = sorted(range(len(curr_probs_l)), key=lambda sub: curr_probs_l[sub])[-3:]
+                max_3_location_names = (inference.CLASS2NAME[max_3_location_classes[2]] + "," +
+                                        inference.CLASS2NAME[max_3_location_classes[1]] + "," +
+                                        inference.CLASS2NAME[max_3_location_classes[0]])
+
+                # Save results in csv format
+                if config["create_csv"]:
+                    new_row = []
+                    new_row.append(curr_set_arr[5].strip())
+                    new_row.append(max_location_name)
+                    new_row.append(max_location_class)
+                    new_row.append(max_3_location_names)
+                    new_row.append(",".join(map(str, max_3_location_classes)))
+                    new_row.extend(probabilities)
+                    new_row.extend(embedding)
+                    df.loc[len(df.index)] = new_row
+
+                config["log"].info("- Saved results for " +curr_set_arr[5].strip() + ", locations predicted [" + max_3_location_names + "]")
+
+        if config["create_csv"]:
+            df.to_csv("result.csv", index=False)
 except Exception as e:
     config["log"].error("- " + str(e))
 

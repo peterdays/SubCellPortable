@@ -1,3 +1,4 @@
 #model_channels: "rybg"
 #model_type: "mae_contrast_supcon_model"
 #update_model: False
+#create_csv: False
