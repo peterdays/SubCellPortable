@@ -6,7 +6,8 @@ import sys
 import pandas as pd
 
 import requests
-from skimage.io import imread, imsave
+import torch
+from skimage.io import imread
 import yaml
 
 import inference
@@ -81,6 +82,7 @@ try:
     model_config = model_config_file.get("model_config")
     model = inference.ViTPoolClassifier(model_config)
     model.load_model_dict(encoder_path, classifier_path)
+    model.eval()
 
     # if we want to generate a csv result
     if config["create_csv"]:
@@ -116,7 +118,8 @@ try:
                     cell_data.append([imread(curr_set_arr[3].strip(), as_gray=True)])
 
                 # We run the model in inference
-                embedding, probabilities = inference.run_model(model, cell_data, os.path.join(curr_set_arr[4], curr_set_arr[5].strip()))
+                with torch.no_grad():
+                    embedding, probabilities = inference.run_model(model, cell_data, os.path.join(curr_set_arr[4], curr_set_arr[5].strip()))
 
                 curr_probs_l = probabilities.tolist()
                 max_location_class = curr_probs_l.index(max(curr_probs_l))
