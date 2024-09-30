@@ -60,10 +60,12 @@ To run SubCellPortable you have first to gather the information about the sets o
 All images can be relative or absolute paths, or directly URLs. You can also skip cells between runs with the special character `#` in front of the desired lines. 
 Check the following `path_list.csv` content as an example of a possible run for the `rbg` model (microtubules, nuclei, protein):
 
-`#r_image,y_image,b_image,g_image,output_folder,output_prefix`
-`images/cell_1_mt.png,,images/cell_1_nuc.png,images/cell_1_prot.png,output,cell1_`
-`#images/cell_2_mt.png,,images/cell_2_nuc.png,images/cell_2_prot.png,output,cell2_`
-`images/cell_3_mt.png,,images/cell_3_nuc.png,images/cell_3_prot.png,output,cell3_`
+```
+#r_image,y_image,b_image,g_image,output_folder,output_prefix
+images/cell_1_mt.png,,images/cell_1_nuc.png,images/cell_1_prot.png,output,cell1_
+#images/cell_2_mt.png,,images/cell_2_nuc.png,images/cell_2_prot.png,output,cell2_
+images/cell_3_mt.png,,images/cell_3_nuc.png,images/cell_3_prot.png,output,cell3_
+```
 
 Once you have prepared your `path_list.csv` you are ready to run the `process.py` script. You can choose between 3 different running approaches, depending on your personal preferences:
 
