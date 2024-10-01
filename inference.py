@@ -98,7 +98,7 @@ def save_attention_map(attn, input_shape, output_path):
 @torch.no_grad()
 def run_model(model, cell_crop, device, output_path):
     cell_crop = np.stack(cell_crop, axis=1)
-    cell_crop = torch.from_numpy(cell_crop).unsqueeze(0).float().to(device)
+    cell_crop = torch.from_numpy(cell_crop).float().to(device)
     cell_crop = min_max_standardize(cell_crop)
 
     output = model(cell_crop)
