@@ -2,3 +2,4 @@
 #model_type: "mae_contrast_supcon_model"
 #update_model: False
 #create_csv: False
+#gpu: -1

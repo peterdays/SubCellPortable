@@ -1,5 +1,5 @@
 classifier_paths:
-    -"models/rbg/vit_supcon_model/classifier.pth"
+    - "models/rbg/vit_supcon_model/classifier.pth"
 encoder_path: "models/rbg/vit_supcon_model/encoder.pth"
 model_config:
   vit_model:

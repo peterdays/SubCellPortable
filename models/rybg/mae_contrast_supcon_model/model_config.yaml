@@ -1,5 +1,6 @@
 classifier_paths:
-    -"models/rybg/mae_contrast_supcon_model/classifier.pth"
+    - "models/rybg/mae_contrast_supcon_model/classifier_s0.pth"
+    - "models/rybg/mae_contrast_supcon_model/classifier_s1.pth"
 encoder_path: "models/rybg/mae_contrast_supcon_model/encoder.pth"
 model_config:
   vit_model:

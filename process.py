@@ -3,11 +3,6 @@ import datetime
 import logging
 import os
 import sys
-
-os.environ["DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-
-
 import pandas as pd
 import requests
 import torch
@@ -16,6 +11,11 @@ from skimage.io import imread
 
 import inference
 from vit_model import ViTPoolClassifier
+
+
+os.environ["DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+
 
 # This is the log configuration. It will log everything to a file AND the console
 logging.basicConfig(
@@ -37,6 +37,7 @@ config["model_channels"] = "rybg"
 config["model_type"] = "mae_contrast_supcon_model"
 config["update_model"] = False
 config["create_csv"] = False
+config["gpu"] = -1
 
 # If you want to use command line parameters with your script, add them here
 if len(sys.argv) > 1:
@@ -71,11 +72,11 @@ if len(sys.argv) > 1:
         default=False,
         type=bool,
     )
-    argparse.add_argument(
+    argparser.add_argument(
         "-g",
         "--gpu",
-        help="the GPU id to use [0, 1, 2, 3]",
-        default=0,
+        help="the GPU id to use [0, 1, 2, 3]. -1 for CPU usage",
+        default=-1,
         type=int,
     )
 
@@ -96,58 +97,6 @@ config["log"].info("----------")
 
 
 try:
-    classifier_path = os.path.join(
-        "models", config["model_channels"], config["model_type"], "classifier.pth"
-    )
-    encoder_path = os.path.join(
-        "models", config["model_channels"], config["model_type"], "encoder.pth"
-    )
-    # Checking for model update
-    if (
-        not os.path.isfile(classifier_path)
-        or not os.path.isfile(encoder_path)
-        or config["update_model"]
-    ):
-        config["log"].info("- Downloading models...")
-        with open("models_urls.yaml", "r") as urls_file:
-            url_info = yaml.safe_load(urls_file)
-
-            response = requests.get(
-                url_info[config["model_channels"]][config["model_type"]]["classifier"]
-            )
-            if response.status_code == 200:
-                with open(
-                    os.path.join(
-                        "models",
-                        config["model_channels"],
-                        config["model_type"],
-                        "classifier.pth",
-                    ),
-                    "wb",
-                ) as downloaded_file:
-                    downloaded_file.write(response.content)
-                config["log"].info("  - classifier.pth updated.")
-            else:
-                config["log"].warning("  - classifier.pth url not found.")
-
-            response = requests.get(
-                url_info[config["model_channels"]][config["model_type"]]["encoder"]
-            )
-            if response.status_code == 200:
-                with open(
-                    os.path.join(
-                        "models",
-                        config["model_channels"],
-                        config["model_type"],
-                        "encoder.pth",
-                    ),
-                    "wb",
-                ) as downloaded_file:
-                    downloaded_file.write(response.content)
-                config["log"].info("  - encoder.pth updated.")
-            else:
-                config["log"].warning("  - encoder.pth url not found.")
-
     # We load the selected model information
     with open(
         os.path.join(
@@ -159,12 +108,47 @@ try:
         "r",
     ) as config_buffer:
         model_config_file = yaml.safe_load(config_buffer)
+
+    classifier_paths = None
+    if "classifier_paths" in model_config_file:
+        classifier_paths = model_config_file["classifier_paths"]
+    encoder_path = model_config_file["encoder_path"]
+
+    needs_update = config["update_model"]
+    for curr_classifier in classifier_paths:
+        needs_update = needs_update or not os.path.isfile(curr_classifier)
+    needs_update = needs_update or not os.path.isfile(encoder_path)
+
+    # Checking for model update
+    if needs_update:
+        config["log"].info("- Downloading models...")
+        with open("models_urls.yaml", "r") as urls_file:
+            url_info = yaml.safe_load(urls_file)
+
+            for index, curr_url_info in enumerate(url_info[config["model_channels"]][config["model_type"]]["classifiers"]):
+                response = requests.get(curr_url_info)
+                if response.status_code == 200:
+                    with open(classifier_paths[index], "wb") as downloaded_file:
+                        downloaded_file.write(response.content)
+                    config["log"].info("  - " + classifier_paths[index] + " updated.")
+                else:
+                    config["log"].warning("  - " + classifier_paths[index] + " url " + curr_url_info + " not found.")
+
+            curr_url_info = url_info[config["model_channels"]][config["model_type"]]["encoder"]
+            response = requests.get(curr_url_info)
+            if response.status_code == 200:
+                with open(encoder_path, "wb") as downloaded_file:
+                    downloaded_file.write(response.content)
+                config["log"].info("  - " + encoder_path + " updated.")
+            else:
+                config["log"].warning("  - " + encoder_path + " url " + curr_url_info + " not found.")
+
     model_config = model_config_file.get("model_config")
     model = ViTPoolClassifier(model_config)
-    model.load_model_dict(encoder_path, classifier_path)
+    model.load_model_dict(encoder_path, classifier_paths)
     model.eval()
 
-    if torch.cuda.is_available():
+    if torch.cuda.is_available() and config["gpu"] != -1:
         device = torch.device("cuda:" + str(config["gpu"]))
     else:
         config["log"].warning("CUDA not available. Using CPU.")
@@ -174,17 +158,20 @@ try:
     # if we want to generate a csv result
     if config["create_csv"]:
         final_columns = [
-            "id",
-            "top_class_name",
-            "top_class",
-            "top_3_classes_names",
-            "top_3_classes",
+            "id"
         ]
-        prob_columns = []
-        for i in range(31):
-            prob_columns.append("prob" + "%02d" % (i,))
-        final_columns.extend(prob_columns)
-        feat_columns = []
+        if classifier_paths:
+            final_columns.extend([
+                "top_class_name",
+                "top_class",
+                "top_3_classes_names",
+                "top_3_classes",
+            ])
+            prob_columns = []
+            for i in range(31):
+                prob_columns.append("prob" + "%02d" % (i,))
+            final_columns.extend(prob_columns)
+            feat_columns = []
         for i in range(1536):
             feat_columns.append("feat" + "%04d" % (i,))
         final_columns.extend(feat_columns)
@@ -218,39 +205,38 @@ try:
                     os.path.join(curr_set_arr[4], curr_set_arr[5].strip()),
                 )
 
-                curr_probs_l = probabilities.tolist()
-                max_location_class = curr_probs_l.index(max(curr_probs_l))
-                max_location_name = inference.CLASS2NAME[max_location_class]
-                max_3_location_classes = sorted(
-                    range(len(curr_probs_l)), key=lambda sub: curr_probs_l[sub]
-                )[-3:]
-                max_3_location_names = (
-                    inference.CLASS2NAME[max_3_location_classes[2]]
-                    + ","
-                    + inference.CLASS2NAME[max_3_location_classes[1]]
-                    + ","
-                    + inference.CLASS2NAME[max_3_location_classes[0]]
-                )
+                if classifier_paths:
+                    curr_probs_l = probabilities.tolist()
+                    max_location_class = curr_probs_l.index(max(curr_probs_l))
+                    max_location_name = inference.CLASS2NAME[max_location_class]
+                    max_3_location_classes = sorted(
+                        range(len(curr_probs_l)), key=lambda sub: curr_probs_l[sub]
+                    )[-3:]
+                    max_3_location_names = (
+                        inference.CLASS2NAME[max_3_location_classes[2]]
+                        + ","
+                        + inference.CLASS2NAME[max_3_location_classes[1]]
+                        + ","
+                        + inference.CLASS2NAME[max_3_location_classes[0]]
+                    )
 
                 # Save results in csv format
                 if config["create_csv"]:
                     new_row = []
                     new_row.append(curr_set_arr[5].strip())
-                    new_row.append(max_location_name)
-                    new_row.append(max_location_class)
-                    new_row.append(max_3_location_names)
-                    new_row.append(",".join(map(str, max_3_location_classes)))
-                    new_row.extend(probabilities)
+                    if classifier_paths:
+                        new_row.append(max_location_name)
+                        new_row.append(max_location_class)
+                        new_row.append(max_3_location_names)
+                        new_row.append(",".join(map(str, max_3_location_classes)))
+                        new_row.extend(probabilities)
                     new_row.extend(embedding)
                     df.loc[len(df.index)] = new_row
 
-                config["log"].info(
-                    "- Saved results for "
-                    + curr_set_arr[5].strip()
-                    + ", locations predicted ["
-                    + max_3_location_names
-                    + "]"
-                )
+                log_message = "- Saved results for " + curr_set_arr[5].strip()
+                if classifier_paths:
+                    log_message = log_message + ", locations predicted [" + max_3_location_names + "]"
+                config["log"].info(log_message)
 
         if config["create_csv"]:
             df.to_csv("result.csv", index=False)

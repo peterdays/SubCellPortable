@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Set, Tuple, Union
 
 import torch
-from torch import nn
 from transformers.modeling_outputs import BaseModelOutput
 from transformers.models.vit.configuration_vit import ViTConfig
 from transformers.models.vit.modeling_vit import (

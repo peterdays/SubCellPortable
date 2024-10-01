@@ -1,28 +1,35 @@
 rybg:
   mae_contrast_supcon_model:
-    classifier: "https://"
+    classifiers:
+      - "https://"
     encoder: "https://"
   vit_supcon_model:
-    classifier: "https://"
+    classifiers: "https://"
     encoder: "https://"
 rbg:
   mae_contrast_supcon_model:
-    classifier: "https://"
+    classifiers:
+      - "https://"
     encoder: "https://"
   vit_supcon_model:
-    classifier: "https://"
+    classifiers:
+      - "https://"
     encoder: "https://"
 ybg:
   mae_contrast_supcon_model:
-    classifier: "https://"
+    classifiers:
+      - "https://"
     encoder: "https://"
   vit_supcon_model:
-    classifier: "https://"
+    classifiers:
+      - "https://"
     encoder: "https://"
 bg:
   mae_contrast_supcon_model:
-    classifier: "https://"
+    classifiers:
+      - "https://"
     encoder: "https://"
   vit_supcon_model:
-    classifier: "https://"
+    classifiers:
+      - "https://"
     encoder: "https://"
