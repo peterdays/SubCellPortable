@@ -1,4 +1,5 @@
-classifier_path: "models/rbg/mae_contrast_supcon_model/classifier.pth"
+classifier_paths:
+    -"models/rbg/mae_contrast_supcon_model/classifier.pth"
 encoder_path: "models/rbg/mae_contrast_supcon_model/encoder.pth"
 model_config:
   vit_model:
@@ -15,12 +16,6 @@ model_config:
       patch_size: 16
       num_channels: 3
       qkv_bias: True
-      decoder_num_attention_heads: 16
-      decoder_hidden_size: 512
-      decoder_num_hidden_layers: 8
-      decoder_intermediate_size: 2048
-      mask_ratio: 0.25
-      norm_pix_loss: True
   pool_model:
       dim: 768
       int_dim: 512
