@@ -74,8 +74,8 @@ CLASS2COLOR = {
 
 
 def min_max_standardize(im):
-    min_val = torch.min(im, dim=(1, 2, 3), keepdims=True)[0]
-    max_val = torch.max(im, dim=(1, 2, 3), keepdims=True)[0]
+    min_val = torch.amin(im, dim=(1, 2, 3), keepdims=True)
+    max_val = torch.amax(im, dim=(1, 2, 3), keepdims=True)
 
     im = (im - min_val) / (max_val - min_val + 1e-6)
     return im
