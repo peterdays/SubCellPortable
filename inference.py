@@ -103,7 +103,7 @@ def run_model(model, cell_crop, device, output_path):
 
     output = model(cell_crop)
 
-    probabilities = output.probabilties[0]
+    probabilities = output.probabilities[0]
     embedding = output.pool_op[0]
     np.save(output_path + "_embedding.npy", embedding)
     np.save(output_path + "_probabilities.npy", probabilities)
