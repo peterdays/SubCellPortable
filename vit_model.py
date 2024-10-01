@@ -336,6 +336,7 @@ class ViTPoolClassifier(nn.Module):
             for k, v in checkpoint.items()
             if "pool_model." in k
         }
+        pool_ckpt = {k.replace(".1.", ".0."): v for k, v in pool_ckpt.items()}
         if pool_ckpt and self.pool_model:
             status = self.pool_model.load_state_dict(pool_ckpt)
             print(f"Pool model status: {status}")
