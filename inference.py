@@ -103,8 +103,9 @@ def run_model(model, cell_crop, device, output_path):
 
     output = model(cell_crop)
 
-    probabilities = output.probabilities[0]
-    embedding = output.pool_op[0]
+    probabilities = output.probabilities[0].cpu().numpy()
+    embedding = output.pool_op[0].cpu().numpy()
+
     np.save(output_path + "_embedding.npy", embedding)
     np.save(output_path + "_probabilities.npy", probabilities)
     save_attention_map(

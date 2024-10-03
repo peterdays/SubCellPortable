@@ -212,12 +212,13 @@ try:
                     max_3_location_classes = sorted(
                         range(len(curr_probs_l)), key=lambda sub: curr_probs_l[sub]
                     )[-3:]
+                    max_3_location_classes.reverse()
                     max_3_location_names = (
-                        inference.CLASS2NAME[max_3_location_classes[2]]
+                        inference.CLASS2NAME[max_3_location_classes[0]]
                         + ","
                         + inference.CLASS2NAME[max_3_location_classes[1]]
                         + ","
-                        + inference.CLASS2NAME[max_3_location_classes[0]]
+                        + inference.CLASS2NAME[max_3_location_classes[2]]
                     )
 
                 # Save results in csv format
