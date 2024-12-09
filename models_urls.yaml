@@ -1,35 +1,36 @@
 rybg:
   mae_contrast_supcon_model:
     classifiers:
-      - "https://"
-    encoder: "https://"
+      - "s3://czi-subcell-public/models/all_channels_MAE_MLP_classifier/all_channels_MAE_MLP_classifier_seed_0.pth"
+    encoder: "s3://czi-subcell-public/models/all_channels_MAE-CellS-ProtS-Pool.pth"
   vit_supcon_model:
-    classifiers: "https://"
-    encoder: "https://"
+    classifiers:
+      - "s3://czi-subcell-public/models/all_channels_ViT_MLP_classifier/all_channels_ViT_MLP_classifier_seed_0.pth"
+    encoder: "s3://czi-subcell-public/models/all_channels_ViT-ProtS-Pool.pth"
 rbg:
   mae_contrast_supcon_model:
     classifiers:
-      - "https://"
-    encoder: "https://"
+      - "s3://czi-subcell-public/models/MT-DNA-Protein_MAE_MLP_classifier/MT-DNA-Protein_MAE_MLP_classifier_seed_0.pth"
+    encoder: "s3://czi-subcell-public/models/MT-DNA-Protein_MAE-CellS-ProtS-Pool.pth"
   vit_supcon_model:
     classifiers:
-      - "https://"
-    encoder: "https://"
+      - "s3://czi-subcell-public/models/MT-DNA-Protein_ViT_MLP_classifier/MT-DNA-Protein_ViT_MLP_classifier_seed_0.pth"
+    encoder: "s3://czi-subcell-public/models/MT-DNA-Protein_ViT-ProtS-Pool.pth"
 ybg:
   mae_contrast_supcon_model:
     classifiers:
-      - "https://"
-    encoder: "https://"
+      - "s3://czi-subcell-public/models/ER-DNA-Protein_MAE_MLP_classifier/ER-DNA-Protein_MAE_MLP_classifier_seed_0.pth"
+    encoder: "s3://czi-subcell-public/models/ER-DNA-Protein_MAE-CellS-ProtS-Pool.pth"
   vit_supcon_model:
     classifiers:
-      - "https://"
-    encoder: "https://"
+      - "s3://czi-subcell-public/models/ER-DNA-Protein_ViT_MLP_classifier/ER-DNA-Protein_ViT_MLP_classifier_seed_0.pth"
+    encoder: "s3://czi-subcell-public/models/ER-DNA-Protein_ViT-ProtS-Pool.pth"
 bg:
   mae_contrast_supcon_model:
     classifiers:
-      - "https://"
-    encoder: "https://"
+      - "s3://czi-subcell-public/models/DNA-Protein_MAE_MLP_classifier/DNA-Protein_MAE_MLP_classifier_seed_0.pth"
+    encoder: "s3://czi-subcell-public/models/DNA-Protein_MAE-CellS-ProtS-Pool.pth"
   vit_supcon_model:
     classifiers:
-      - "https://"
-    encoder: "https://"
+      - "s3://czi-subcell-public/models/DNA-Protein_ViT_MLP_classifier/DNA-Protein_ViT_MLP_classifier_seed_0.pth"
+    encoder: "s3://czi-subcell-public/models/DNA-Protein_ViT-ProtS-Pool.pth"

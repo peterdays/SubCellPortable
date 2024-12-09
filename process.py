@@ -8,6 +8,11 @@ import requests
 import torch
 import yaml
 from skimage.io import imread
+import boto3
+from botocore import UNSIGNED
+from botocore.config import Config
+from botocore.exceptions import ClientError
+from urllib.parse import urlparse
 
 import inference
 from vit_model import ViTPoolClassifier
@@ -126,22 +131,40 @@ try:
             url_info = yaml.safe_load(urls_file)
 
             for index, curr_url_info in enumerate(url_info[config["model_channels"]][config["model_type"]]["classifiers"]):
-                response = requests.get(curr_url_info)
-                if response.status_code == 200:
-                    with open(classifier_paths[index], "wb") as downloaded_file:
-                        downloaded_file.write(response.content)
-                    config["log"].info("  - " + classifier_paths[index] + " updated.")
+                if curr_url_info.startswith("s3://"):
+                    try:
+                        s3 = boto3.client('s3', config=Config(signature_version=UNSIGNED))
+                        urlcomponents = urlparse(curr_url_info)
+                        s3.download_file(urlcomponents.netloc, urlcomponents.path[1:], classifier_paths[index])
+                        config["log"].info("  - " + classifier_paths[index] + " updated.")
+                    except ClientError as e:
+                        config["log"].warning("  - " + classifier_paths[index] + " s3 url " + curr_url_info + " not working.")
                 else:
-                    config["log"].warning("  - " + classifier_paths[index] + " url " + curr_url_info + " not found.")
+                    response = requests.get(curr_url_info)
+                    if response.status_code == 200:
+                        with open(classifier_paths[index], "wb") as downloaded_file:
+                            downloaded_file.write(response.content)
+                        config["log"].info("  - " + classifier_paths[index] + " updated.")
+                    else:
+                        config["log"].warning("  - " + classifier_paths[index] + " url " + curr_url_info + " not found.")
 
             curr_url_info = url_info[config["model_channels"]][config["model_type"]]["encoder"]
-            response = requests.get(curr_url_info)
-            if response.status_code == 200:
-                with open(encoder_path, "wb") as downloaded_file:
-                    downloaded_file.write(response.content)
-                config["log"].info("  - " + encoder_path + " updated.")
+            if curr_url_info.startswith("s3://"):
+                try:
+                    s3 = boto3.client('s3', config=Config(signature_version=UNSIGNED))
+                    urlcomponents = urlparse(curr_url_info)
+                    s3.download_file(urlcomponents.netloc, urlcomponents.path[1:], encoder_path)
+                    config["log"].info("  - " + encoder_path + " updated.")
+                except ClientError as e:
+                    config["log"].warning("  - " + encoder_path + " s3 url " + curr_url_info + " not working.")
             else:
-                config["log"].warning("  - " + encoder_path + " url " + curr_url_info + " not found.")
+                response = requests.get(curr_url_info)
+                if response.status_code == 200:
+                    with open(encoder_path, "wb") as downloaded_file:
+                        downloaded_file.write(response.content)
+                    config["log"].info("  - " + encoder_path + " updated.")
+                else:
+                    config["log"].warning("  - " + encoder_path + " url " + curr_url_info + " not found.")
 
     model_config = model_config_file.get("model_config")
     model = ViTPoolClassifier(model_config)
