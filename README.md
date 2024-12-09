@@ -9,7 +9,7 @@ Installation
 If you use any Python IDE (VSCode, PyCharm, Spyder, etc...), just:
 - Either import the project into your IDE through git/github OR Create a new project and download all the repository code from github into it.
 - Create a virtual environment for that project.
-- Install the project requirements through your IDE.
+- Install the project requirements through your IDE. Make sure the packages versions match, as IDEs try to be too smart some times.
 
 If you want to install it via basic Python virtual environment:
 - Install `python3`, `pip` and `virtualenv` in case you don't have them yet.
@@ -17,9 +17,9 @@ If you want to install it via basic Python virtual environment:
   - Example: `cd /home/lab/sandbox`
 - Create a virtual environment:
   - Example: `python3 -m venv subcell`
-- Download/cloe all the repository code inside your virtual environment directory.
+- Download/clone all the repository code inside your virtual environment directory.
 - Navigate to your virtual environment directory and activate it:
-  - Example: `source bin/activate`
+  - Example: `source bin/activate` (linux) or `Scripts\activate.bat` (windows)
 - Install all requirements through pip:
   - Example: `pip install -r requirements.txt`
 - Profit!
