@@ -28,7 +28,9 @@ If you want to install it via basic Python virtual environment:
 Setup
 -----
 
-You need to download the SubCell model files you want to use. The simplest way to do this is:
+You need to download the SubCell model files you want to use. If you want to use the default public models and classifiers (by default only one classifier is used), you don't need to do anything.
+
+Alternatively, you might want to customize which model and/or classifier(s) you want to use. The simplest way to do this is:
 
 - Edit and modify `models_urls.yaml` file:
 - Locate the lines related to the model(s) you want to use and input the model URLs.
