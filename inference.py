@@ -91,7 +91,6 @@ def save_attention_map(attn, input_shape, output_path):
         scale_each=True,
     )
     attn = (attn.permute(1, 2, 0).cpu().numpy() * 255).astype(np.uint8)
-    attn = 255 - attn
     imsave(output_path + "_attention_map.png", attn)
 
 
