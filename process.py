@@ -3,20 +3,19 @@ import datetime
 import logging
 import os
 import sys
+from urllib.parse import urlparse
+
+import boto3
+import inference
 import pandas as pd
 import requests
 import torch
 import yaml
-from skimage.io import imread
-import boto3
 from botocore import UNSIGNED
 from botocore.config import Config
 from botocore.exceptions import ClientError
-from urllib.parse import urlparse
-
-import inference
+from skimage.io import imread
 from vit_model import ViTPoolClassifier
-
 
 os.environ["DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
