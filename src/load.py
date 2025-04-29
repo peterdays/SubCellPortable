@@ -1,14 +1,12 @@
 import os
-import pandas as pd
-import requests
-import torch
-import yaml
+from urllib.parse import urlparse
+
 import boto3
+import requests
+import yaml
 from botocore import UNSIGNED
 from botocore.config import Config
 from botocore.exceptions import ClientError
-from urllib.parse import urlparse
-
 from subcellportable.vit_model import ViTPoolClassifier
 
 # to avoid relative path problems

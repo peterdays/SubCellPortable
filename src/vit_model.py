@@ -1,21 +1,17 @@
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Set, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import torch
+from torch import Tensor, nn
 from transformers.modeling_outputs import BaseModelOutput
 from transformers.models.vit.configuration_vit import ViTConfig
-from transformers.models.vit.modeling_vit import (
-    BaseModelOutputWithPooling,
-    ViTAttention,
-    ViTEmbeddings,
-    ViTIntermediate,
-    ViTOutput,
-    ViTPatchEmbeddings,
-    ViTPooler,
-    ViTPreTrainedModel,
-    ViTSdpaAttention,
-)
-from torch import nn, Tensor
+from transformers.models.vit.modeling_vit import (BaseModelOutputWithPooling,
+                                                  ViTAttention, ViTEmbeddings,
+                                                  ViTIntermediate, ViTOutput,
+                                                  ViTPatchEmbeddings,
+                                                  ViTPooler,
+                                                  ViTPreTrainedModel,
+                                                  ViTSdpaAttention)
 
 
 @dataclass
