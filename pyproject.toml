@@ -26,4 +26,4 @@ package-dir = { "subcellportable" = "src" }
 packages = ["subcellportable"]
 
 [tool.setuptools.package-data]
-"subcellportable" = ["*"]
+"subcellportable" = ["*", "**/*"]
