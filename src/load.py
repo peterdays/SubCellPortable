@@ -33,7 +33,9 @@ def model_load(config, temp_path = None):
 
     encoder_path = model_config_file["encoder_path"]
     if temp_path is not None:
-        encoder_path = os.path.join(base_path, temp_path, encoder_path)
+        fold_path = os.path.join(base_path, temp_path)
+        os.makedirs(encoder_path, exist_ok=True)
+        encoder_path = os.path.join(fold_path, encoder_path)
     else:
         encoder_path = os.path.join(base_path, encoder_path)
     needs_update = config["update_model"]
