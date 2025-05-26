@@ -12,7 +12,7 @@ from subcellportable.vit_model import ViTPoolClassifier
 # to avoid relative path problems
 base_path = os.path.dirname(os.path.abspath(__file__))
 
-def model_load(config, temp_path = None):
+def model_load(config, temp_path_suffix = None):
     # We load the selected model information
     with open(
         os.path.join(
@@ -32,12 +32,13 @@ def model_load(config, temp_path = None):
     classifier_paths = [os.path.join(base_path, p) for p in classifier_paths]
 
     encoder_path = model_config_file["encoder_path"]
-    if temp_path is not None:
-        fold_path = os.path.join(base_path, temp_path)
-        os.makedirs(encoder_path, exist_ok=True)
-        encoder_path = os.path.join(fold_path, encoder_path)
-    else:
-        encoder_path = os.path.join(base_path, encoder_path)
+
+    if temp_path_suffix is not None:
+        # ugly workaround: to guarantee that triggering multiple downloads doesnt break
+        encoder_path = encoder_path.split(".")[0] + temp_path_suffix + "." + encoder_path.split(".")[1]
+
+    encoder_path = os.path.join(base_path, encoder_path)
+
     needs_update = config["update_model"]
     for curr_classifier in classifier_paths:
         needs_update = needs_update or not os.path.isfile(curr_classifier)
