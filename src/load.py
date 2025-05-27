@@ -32,12 +32,16 @@ def model_load(config, temp_path_suffix = None):
     classifier_paths = [os.path.join(base_path, p) for p in classifier_paths]
 
     encoder_path = model_config_file["encoder_path"]
-
+    print("AAAAAAAAAAA")
+    print(classifier_paths)
+    print()
     if temp_path_suffix is not None:
         # ugly workaround: to guarantee that triggering multiple downloads doesnt break
         encoder_path = encoder_path.split(".")[0] + temp_path_suffix + "." + encoder_path.split(".")[1]
         classifier_paths = [p.split(".")[0] + temp_path_suffix + "." + p.split(".")[1] for p in classifier_paths]
-
+    print("AAAAAAAAAAA")
+    print(classifier_paths)
+    print()
     encoder_path = os.path.join(base_path, encoder_path)
 
     needs_update = config["update_model"]
