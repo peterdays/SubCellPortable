@@ -36,10 +36,10 @@ def model_load(config, temp_path_suffix = None):
     print(classifier_paths)
     print()
     if temp_path_suffix is not None:
-        # ugly workaround: to guarantee that triggering multiple downloads doesnt break
-        encoder_path = encoder_path.split(".")[-2] + temp_path_suffix + "." + encoder_path.split(".")[-1]
-        classifier_paths = [p.split(".")[-2] + temp_path_suffix + "." + p.split(".")[-1] for p in classifier_paths]
-    print("AAAAAAAAAAA")
+        # # ugly workaround: to guarantee that triggering multiple downloads doesnt break
+        encoder_path = encoder_path.rsplit('.', 1)[0] + temp_path_suffix + '.' + encoder_path.rsplit('.', 1)[1]
+        classifier_paths = [p.rsplit('.', 1)[0] + temp_path_suffix + '.' + p.rsplit('.', 1)[1] for p in classifier_paths]
+
     print(classifier_paths)
     print()
     encoder_path = os.path.join(base_path, encoder_path)
