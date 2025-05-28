@@ -1,21 +1,17 @@
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Set, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import torch
+from torch import Tensor, nn
 from transformers.modeling_outputs import BaseModelOutput
 from transformers.models.vit.configuration_vit import ViTConfig
-from transformers.models.vit.modeling_vit import (
-    BaseModelOutputWithPooling,
-    ViTAttention,
-    ViTEmbeddings,
-    ViTIntermediate,
-    ViTOutput,
-    ViTPatchEmbeddings,
-    ViTPooler,
-    ViTPreTrainedModel,
-    ViTSdpaAttention,
-)
-from torch import nn, Tensor
+from transformers.models.vit.modeling_vit import (BaseModelOutputWithPooling,
+                                                  ViTAttention, ViTEmbeddings,
+                                                  ViTIntermediate, ViTOutput,
+                                                  ViTPatchEmbeddings,
+                                                  ViTPooler,
+                                                  ViTPreTrainedModel,
+                                                  ViTSdpaAttention)
 
 
 @dataclass
@@ -323,7 +319,7 @@ class ViTPoolClassifier(nn.Module):
         classifier_paths: Union[str, List[str]],
         device="cpu",
     ):
-        checkpoint = torch.load(encoder_path, map_location=device)
+        checkpoint = torch.load(encoder_path, map_location=device, weights_only=False)
         encoder_ckpt = {
             k[len("encoder.") :]: v for k, v in checkpoint.items() if "encoder." in k
         }
@@ -350,7 +346,8 @@ class ViTPoolClassifier(nn.Module):
             [self.make_classifier() for _ in range(len(classifier_paths))]
         )
         for i, classifier_path in enumerate(classifier_paths):
-            classifier_ckpt = torch.load(classifier_path, map_location=device)
+            classifier_ckpt = torch.load(classifier_path, map_location=device,
+                                         weights_only=False)
             classifier_ckpt = {
                 k.replace("3.", "2."): v for k, v in classifier_ckpt.items()
             }
