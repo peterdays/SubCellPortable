@@ -13,7 +13,8 @@ from subcellportable.vit_model import ViTPoolClassifier
 base_path = os.path.dirname(os.path.abspath(__file__))
 
 
-def model_load(config, temp_path_suffix=None):
+def model_load(config):
+    temp_path_suffix = config.get("temp_path_suffix", None)
     # We load the selected model information
     with open(
         os.path.join(
